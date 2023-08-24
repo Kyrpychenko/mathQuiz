@@ -1,12 +1,8 @@
 <template>
-  <h1 class="d-flex justify-content-center align-items-center header">
-    Math Quiz
-  </h1>
-  <h3 class="d-flex justify-content-center align-items-center">
-    Try to go as far as you can!
-  </h3>
+  <h1 class="d-flex justify-content-center align-items-center header">Math Quiz</h1>
+  <h3 class="d-flex justify-content-center align-items-center">Try to go as far as you can!</h3>
   <div class="textWrapper">
-    <h3>Questions answered:{{ questionCount + 1 }}</h3>
+    <h3>Question: {{ questionCount + 1 }}</h3>
     <h1 class="d-flex justify-content-center align-items-center">
       {{ questions[questionCount].question }}
     </h1>
@@ -18,15 +14,27 @@
   <div class="questionWrapper">
     <div
       v-for="answer in questions[questionCount].answers"
-      @click="answerClick(answer)"
+      @click="
+        answerClick(answer);
+        clicked = answer;
+      "
       class="d-flex justify-content-center align-items-center answerWrapper"
+      :class="
+        // clicked === questions[questionCount].correctAnswer && answer === clicked
+        //   ? 'bg-success'
+        //   : ''
+        changeAnswerBackground(answer)
+      "
     >
       {{ answer }}
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
+const clicked = ref<null | number>(null);
+const correctColor = ref('');
+const wrongColor = ref('');
 const questionCount = ref(0);
 const correctQuestionsCount = ref(0);
 const wrongQuestionsCount = ref(0);
@@ -39,22 +47,35 @@ const questions = ref<
 >([]);
 
 function answerClick(answer: number) {
-  if (answer === questions.value[questionCount.value].correctAnswer) {
+  setTimeout(() => {
+    if (answer === questions.value[questionCount.value].correctAnswer) {
+      correctQuestionsCount.value++;
+      correctColor.value = 'correctColor';
+    } else {
+      wrongQuestionsCount.value++;
+      wrongColor.value = 'wrongColor';
+    }
     questionCount.value++;
-    correctQuestionsCount.value++;
+    clicked.value = null;
     generateQuestion();
-  } else {
-    wrongQuestionsCount.value++;
-  }
+  }, 1000);
 }
 
 function placeCorrectAnswerPosition() {
-  questions.value[questionCount.value].answers.splice(
-    Math.floor(Math.random() * 4),
-    1,
-    questions.value[questionCount.value].correctAnswer
-  );
+  questions.value[questionCount.value].answers.splice(Math.floor(Math.random() * 4), 1, questions.value[questionCount.value].correctAnswer);
 }
+
+function changeAnswerBackground(answer: number) {
+  if (clicked.value !== questions.value[questionCount.value].correctAnswer && answer === clicked.value) {
+    return 'bg-danger';
+  }
+  if (clicked.value !== null && answer === questions.value[questionCount.value].correctAnswer) {
+    return 'bg-success';
+  }
+
+  return '';
+}
+
 generateQuestion();
 function generateQuestion() {
   const questionStructure = Math.random();
@@ -72,9 +93,7 @@ function generateQuestion() {
       ],
       correctAnswer: numberOne + numberTwo * numberThree,
     });
-    questions.value[
-      questionCount.value
-    ].question = `${numberOne} + ${numberTwo} * ${numberThree}`;
+    questions.value[questionCount.value].question = `${numberOne} + ${numberTwo} * ${numberThree}`;
   } else if (questionStructure <= 50 && questionStructure >= 25) {
     questions.value.push({
       question: `${numberOne} * (${numberTwo} + ${numberThree})`,
