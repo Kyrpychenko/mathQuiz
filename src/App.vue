@@ -1,11 +1,11 @@
 <template>
   <h1 class="d-flex justify-content-center align-items-center header">Math Quiz</h1>
   <h3 class="d-flex justify-content-center align-items-center">Try to go as far as you can!</h3>
+  <h1 class="d-flex justify-content-center align-items-center">
+    {{ questions[questionCount].question }}
+  </h1>
   <div class="textWrapper">
     <h3>Question: {{ questionCount + 1 }}</h3>
-    <h1 class="d-flex justify-content-center align-items-center">
-      {{ questions[questionCount].question }}
-    </h1>
     <div>
       <h3>Questions correct: {{ correctQuestionsCount }}</h3>
       <h3>Questions wrong: {{ wrongQuestionsCount }}</h3>
